@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -73,7 +74,7 @@
         </nav>
 
         <main class="py-4">
-            @include('inc/messages')
+            <x-alert/>
             @yield('content')
         </main>
     </div>
@@ -88,5 +89,24 @@
         color:white;
         text-decoration: none;
     }
+
+    /* side-bar */
+    .side-bar-items:hover
+    {
+        cursor: pointer;
+        background-color: lightgreen;
+    }
+    .side-bar-inner-items
+    {
+        margin-left: 100px !important;
+        background-color: lightgreen;
+        z-index: 1;
+        /* display: none; */
+    }
+    image
+    {
+        /* z-index: 1; */
+    }
 </style>
+
 </html>

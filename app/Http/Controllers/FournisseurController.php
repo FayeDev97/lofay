@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Produit;
 use Illuminate\Support\Facades\Storage;
+use App\Produit;
+use App\CategoriesProduit;
 
 class FournisseurController extends Controller
 {
@@ -20,25 +21,27 @@ class FournisseurController extends Controller
     
     function index()
     {
-        return view("fournisseur/index");
-    }
-    function listeProduits()
-    {
-        $produits = Produit::all();
-
-        return view("fournisseur/listeProduits", ['produits' => $produits]);
+        $this->estFournisseur();
+        $produits = Produit::where('id_fournisseur',auth()->id())
+                            ->orderBy('created_at','desc')
+                            ->get();
+        return view("fournisseur/index", ['produits' => $produits]);
     }
     function ajouterProduit()
     {
-        return view("fournisseur/ajouterProduit");
+        $this->estFournisseur();
+        $categories = CategoriesProduit::all();
+        return view("fournisseur/ajouterProduit",['categories' => $categories]);
     }
     function ajouter(Request $request)
     {
+        $this->estFournisseur();
         $request->validate(
             [
                 // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'libelle' =>'required',
                 'prixInit' =>'required',
+                'idCategorie' =>'required',
             ],
             [
             'libelle.required'=>'Veillez ajouter le nom du produit',
@@ -48,6 +51,7 @@ class FournisseurController extends Controller
         $produit = new Produit();
         $produit->libelle        = $request['libelle'];
         $produit->prixInit       = $request['prixInit'];
+        $produit->idCategorie      = $request['idCategorie'];
         $produit->id_fournisseur = $request['id_fournisseur'];
         
         if($request->file('image'))
@@ -62,27 +66,35 @@ class FournisseurController extends Controller
         $produit->image = $nomImage;
         $produit->save();
 
-        return redirect("listeProduits");
+        return redirect("/fournisseur");
     }
-    function supprimerProduit($idProduit)
+    function supprimerProduit($id_produit)
     {
-        $produit = Produit::find($idProduit);
+        $this->estFournisseur();
+        $id_fournisseur = auth()->id();
+        $produit = Produit::find($id_produit);
+        $this->estProprietaire($id_fournisseur, $produit);
         
         if(Storage::exists('produits/'.$produit->image))
-            if(Storage::delete('produits/'.$produit->image))
-                $produit->delete();
-        
-        return redirect("listeProduits");
+            Storage::delete('produits/'.$produit->image);
+            
+        $produit->delete();
+        return redirect("fournisseur/index");
     }
-    function modifierProduit($idProduit)
+    function modifierProduit($id_produit)
     {
-        $produit = Produit::find($idProduit);
+        $this->estFournisseur();
+        $produit = Produit::find($id_produit);
+        $this->estProprietaire(auth()->id(), $produit);
+
         return view("fournisseur/modifierProduit", ['produit' => $produit]);
     }
     
     function modifier(Request $request)
     {
-        $produit = Produit::find($request['id']);
+        $this->estFournisseur();
+        $produit = Produit::find($request['id_produit']);
+        $this->estProprietaire(auth()->id(), $produit);
 
         if($request->file('image'))
         {
@@ -99,7 +111,7 @@ class FournisseurController extends Controller
         $produit->libelle = $request['libelle'];
         $produit->prixInit = $request['prixInit'];
         $produit->save();
-        return redirect('listeProduits');
+        return redirect('/fournisseur');
     }
 
     private function filtrePrix(String $prix)
@@ -113,5 +125,15 @@ class FournisseurController extends Controller
             }
         }
         return $prix;
+    }
+    private function estFournisseur()
+    {
+        if(auth()->user()->role != 1)
+            return view('/index');
+    }
+    private function estProprietaire($id_fournisseur, $produit)
+    {
+        if($id_fournisseur != $produit->id_fournisseur)
+            return view('fournisseur/index');
     }
 }

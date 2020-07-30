@@ -50,11 +50,11 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'role' => ['required'],
-            'adresse' => ['required'],
+            'role'     => ['required'],
+            'adresse'  => ['required'],
         ]);
     }
 
@@ -66,33 +66,22 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        if($data['role'] == 'fournisseur')
-        {
-            $role = 1;
-        }else
-        {
-            $role = 2;
-        }
+        // if($data['role'] == 'fournisseur')
+        // {
+        //     $role = 1;
+        // }else
+        // {
+        //     $role = 2;
+        // }
+        $role = ($data['role'] == 'fournisseur') ? 1 : 2;
         return  User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name'     => $data['name'],
+            'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'adresse' => $data['adresse'],
-            'role' => $role,
-            'numero' => $data['numero'],
+            'adresse'  => $data['adresse'],
+            'role'     => $role,
+            'numero'   => $data['numero'],
         ]);
     }
-    protected function authenticated(Request $request, $user)
-    {
-        if ($user->estClient()) 
-        {
-            return redirect()->action('ClientController@index');    
-        }elseif($user->estFournisseur())
-        {
-            return redirect()->action('FournisseurController@index');    
-        }else
-        {
-            return redirect()->action('AdminController@index');    
-        }
-    }
+    
 }

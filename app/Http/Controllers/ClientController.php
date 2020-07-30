@@ -18,6 +18,6 @@ class ClientController extends Controller
     
     function index()
     {
-        return view("client/index");
+        return view("/index");
     }
 }

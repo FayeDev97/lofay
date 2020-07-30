@@ -37,6 +37,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    function produits()
+    {
+        return $this->hasMany('App\Produit');
+    }
     function estClient()
     {
         if($this->role == 2)

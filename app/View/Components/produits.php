@@ -3,8 +3,9 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
+use App\Produit;
 
-class produit extends Component
+class produits extends Component
 {
     /**
      * Create a new component instance.
@@ -23,6 +24,9 @@ class produit extends Component
      */
     public function render()
     {
-        return view('components.produit');
+        $produits = Produit::orderBy('created_at','desc')
+                            ->get();;
+
+        return view('components.produits', ['produits' => $produits]);
     }
 }
