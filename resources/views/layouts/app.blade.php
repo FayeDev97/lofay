@@ -78,35 +78,9 @@
             @yield('content')
         </main>
     </div>
+    @yield('js')
 </body>
-<style>
-    a
-    {
-        color: whitesmoke;
-    }
-    a:hover
-    {
-        color:white;
-        text-decoration: none;
-    }
+@yield('css')
 
-    /* side-bar */
-    .side-bar-items:hover
-    {
-        cursor: pointer;
-        background-color: lightgreen;
-    }
-    .side-bar-inner-items
-    {
-        margin-left: 100px !important;
-        background-color: lightgreen;
-        z-index: 1;
-        /* display: none; */
-    }
-    image
-    {
-        /* z-index: 1; */
-    }
-</style>
 
 </html>

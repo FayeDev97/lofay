@@ -17,7 +17,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentification
 Auth::routes();
+
+// MainController
 Route::get('/', 'MainController@index');
 Route::get('/index', 'MainController@index');
 Route::get('/accueil', 'MainController@index');
@@ -25,9 +28,11 @@ Route::get('/FAQ','MainController@FAQ');
 Route::get('/fournisseurs', 'MainController@fournisseurs');
 Route::get('/boutiques', 'MainController@boutiques');
 
+// ClientController
 Route::any('/client', 'ClientController@index');
 Route::any('/client/index', 'ClientController@index');
 
+// FournisseurController
 Route::get('/fournisseur','FournisseurController@index');
 Route::get('/fournisseur/index','FournisseurController@index');
 
@@ -38,3 +43,8 @@ Route::get('/modifierProduit/{id_produit}','FournisseurController@modifierProdui
 
 Route::post('/ajouter','FournisseurController@ajouter');
 Route::any('/modifier','FournisseurController@modifier');
+
+// PanierController
+Route::get('ajaxGetPanier/{$id_produit}','PanierController@ajaxGetPanier');
+Route::get('ajaxAjouterArticle/{$id_produit}','PanierController@ajaxAjouterArticle');
+Route::get('ajaxSupprimerArticle/{$id_produit}','PanierController@ajaxSupprimerArticle');

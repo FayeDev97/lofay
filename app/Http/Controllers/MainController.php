@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\CategoriesProduit;
+use App\User;
 
 class MainController extends Controller
 {
@@ -15,11 +17,13 @@ class MainController extends Controller
      */
     public function index()
     {
-        return view('/index');
+        $categories = CategoriesProduit::all();
+        return view('/index',['categories'=>$categories]);
     }
     public function fournisseurs()
     {
-        return view('/fournisseurs');
+        $fournisseurs = User::where('role', 1)->get();
+        return view('/fournisseurs', ['fournisseurs' => $fournisseurs]);
     }
     public function boutiques()
     {
