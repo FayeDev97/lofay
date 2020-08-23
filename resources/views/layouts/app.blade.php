@@ -23,10 +23,10 @@
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name') }}
-                </a>
+            <div class="container-fluid pl-0">
+            <a href="/index" class="m-0 p-0">
+                <img src="{{Storage::url('logo2.png')}}" alt="logo" height="60px" class="m-0 p-0">
+            </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -78,9 +78,7 @@
             @yield('content')
         </main>
     </div>
-    @yield('js')
 </body>
+@yield('js')
 @yield('css')
-
-
 </html>

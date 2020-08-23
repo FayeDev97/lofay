@@ -45,6 +45,7 @@ Route::post('/ajouter','FournisseurController@ajouter');
 Route::any('/modifier','FournisseurController@modifier');
 
 // PanierController
-Route::get('ajaxGetPanier/{$id_produit}','PanierController@ajaxGetPanier');
+Route::get('ajaxGetPanier','PanierController@ajaxGetPanier');
 Route::get('ajaxAjouterArticle/{$id_produit}','PanierController@ajaxAjouterArticle');
 Route::get('ajaxSupprimerArticle/{$id_produit}','PanierController@ajaxSupprimerArticle');
+Route::get('testAjax','PanierController@testAjax');

@@ -1,11 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+<span id="top"></span>
 <div class="container-fluid row">
-    <div class="side-bar p-0 pt-5 d-inline-block bg-light sticky-top col h-50">
-        <div id="panier" class="side-bar-inner-items border rounded shadow position-absolute float-right p-2 bg-light row flex-column">
-            
-        </div>
+    <div class="side-bar p-0 pt-5 d-inline-block bg-light sticky-top col h-50" id="side-bar">
+        
         <div id="panier-btn" class="side-bar-items m-0 mb-4 ml-1 p-1 py-2 row flex-column align-items-center border rounded">
             <svg width="1.9em" height="1.9em" viewBox="0 0 16 16" class="bi bi-cart" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
@@ -50,6 +49,11 @@
         </a>
     </div>
     <div class="col-11">
+        <div class="container">
+            <div id="panier" class="container border rounded shadow  bg-light row d-none">
+                <span>Vide<span>
+            </div>
+        </div>
         <div class="container-fluid border rounded my-4 py-2">
             <x-barre-de-recherche/>
         </div>
@@ -61,34 +65,199 @@
 @endsection
 @section('js')
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('.side-bar-inner-items').hide();
+    $(document).ready(function() 
+    {
+        // Variables goblales
+        let panier = $('#panier');
+        let panier_vide = true; 
+        let categorie = $('#categorie');
+        let article_actif = null;
+        
+        // -----------------Fonctions-----------------
+        
+        // Cacher/Afficher les informations d'un produit
+        function toggleInfoProduit(produit) 
+        {
+            cacherPanier();
+            cacherCategorie();
+            produit.parent().toggleClass('col-2 col-4');
+            produit.toggleClass('shadow');
+            produit.children().toggleClass('col-12 col-5 mx-2');
+            produit.children().children('.info_produit').toggleClass('d-none');
+            produit.children().children('.produit_exit').toggleClass('d-none');
+        }
+        // Cache le panier
+        function cacherPanier()
+        {
+            if(panier.css('display') != 'none')
+                panier.toggleClass('d-none');
+        }
+        // Cache les categories de produit
+        function cacherCategorie()
+        {
+            if(categorie.css('display') != 'none')
+                categorie.toggle();
+        }
+        // Ajoute un produit au panier
+        function ajouterProduitPanier(produit) 
+        {
+            if(panier_vide)
+                panier.children().remove();
+            panier_vide = false;
+
+            //Recuperer les buttons
+            let btn_supprimer = '<button class="btn btn-danger btn-sm supprimer_produit">'+
+                                    'supprimer'+
+                                '</button>';
+            let input_id = produit.children('.row').children('input');
+            
+            // Effectuer requete ajax
+            // ajaxAjouterProduit(input_id.val());
+            
+            // Enlever infos du produit
+            produit.children('.row')
+                   .remove();
+            produit.children().children('.prix')
+                   .remove();
+            // Reduire la taille de l image
+            produit.children().children('img').css('height','70px');
+            // Ajouter les buttons
+            produit.children().toggleClass('col-5 d-flex flex-column justify-content-center')
+                   .append(btn_supprimer)
+                   .append(input_id);
+            // Modifier quelques classes
+            produit.toggleClass('produit shadow col-1 px-0');
+            // Ajouter l element creer au panier
+            $('#panier').append(produit);
+        }
+        // Enleve un produit du panier
+        function supprimerProduitPanier(produit)
+        {
+            produit.remove();
+            if(panier.children().length < 1 )
+            {
+                panier.append('<span>Vide</span>');
+                panier_vide = true;
+            }
+        }
+
+        // -----------------Ajax-----------------
+        // Test methode ajax
+        // $.ajax({
+        //     method  :'GET',
+        //     url     :'testAjax',
+        //     dataType:'html'
+        // }).done(function(data)
+        // {
+        //     panier.append(data)
+        // });
+
+        function ajaxAjouterProduit(idProduit)
+        {
+            $.ajax({
+                method:'GET',
+                url   :'ajaxAjouterArticle/'+idProduit
+            }).done(function()
+            {
+                alert('produit ajoute au panier');
+            }).fail(function()
+            {
+                alert('erreur');
+            });
+        }
+        
+        function ajaxGetPanier()
+        {
+            $.ajax({
+                method  :'GET',
+                url     :'ajaxGetPanier',
+                dataType:'json'
+            }).done(function(data)
+            {
+                return data;
+            });
+        }
+        // -----------------Evenements-----------------
+       
+        //---------Listeners barre lateral---------
         $('#categorie-btn').click(function()
         {
-            if($('#panier').css('display') != 'none')
-            {
-                $('#panier').toggle();
-            }
-            $('#categorie').toggle();
-        })
+            cacherPanier();
+            categorie.toggle();
+        });
+
         $('#panier-btn').click(function()
         {
-            if($('#categorie').css('display') != 'none')
-            {
-                $('#categorie').toggle();
-            }
-            $('#panier').toggle();
-        })
+            cacherCategorie()
+            panier.toggleClass('d-none');
+        });
         
-        // Gestion du panier
+        // ---------manipulation Produit--------- 
+        // Afficher/cacher les informations du produit apres click
+        $('.produit').click(function()
+        {
+            let produit = $(this);
+            if(article_actif != null)
+            {
+                if(article_actif.children().children('input').val() == produit.children().children('input').val())
+                {
+                    toggleInfoProduit(produit);
+                    article_actif = null;
+                }else
+                {
+                    toggleInfoProduit(article_actif);
+                    toggleInfoProduit(produit);
+                    article_actif = produit;
+                }
+            }else
+            {
+                toggleInfoProduit(produit);
+                article_actif = produit;
+            }
+        });
 
-        // if()
+        //---------Gestion du panier---------
+        //ajoute un produit au panier
+        $('.ajouter_produit').click(function()
+        {        
+            let produit = $(this).parent().parent().parent().parent()
+                                .clone();
+            ajouterProduitPanier(produit);
+        });
+       // supprime un produit du panier
+        panier.click(function()
+        {
+            let target  = $(event.target);
+            let produit = target.parent().parent();
+            if(target.hasClass('supprimer_produit'))
+            {
+                supprimerProduitPanier(produit); 
+            }
+        });
+       
     });
 </script>
 @endsection
 
 @section('css')
 <style>
+    /*icone svg source:svgicons.sparkk.fr */
+    #bare-de-recherche, #bare-de-recherche input, #bare-de-recherche select
+    {
+        font-size: 0.9em!important;
+    }
+    .svg-icon {
+    width: 1.4em;
+    height: 1.4em;
+    }
+
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+    fill: red;
+    }
+
+    /*  */
     a
     {
         color: whitesmoke;
@@ -113,18 +282,35 @@
     {
         /* padding-top: 30px !important; */
     }
-    .side-bar-items:hover
+    .side-bar-items:hover, .produit_exit:hover
     {
         cursor: pointer;
-        /* background-color: lightgreen; */
     }
     .side-bar-inner-items
     {
+        display: none;
         margin-left: 100px !important;
         /* background-color: lightgreen; */
-        z-index: 20 !important;
-        /* display: none; */
     }
-  
+
+    /* Produit */
+    
+    .produit
+    {
+        font-size: 0.9em!important;
+        min-height: 180px!important;
+        /* margin-left: 110px!important; */
+    }
+    .produit:hover
+    {
+        cursor: pointer;
+        box-shadow: -3px 6px 10px -5px rgba(81, 82, 82, 0.616);
+        border: 1px solid rgb(199, 199, 199) !important;
+        border-radius: 3px;
+    }
+    .produit button
+    {
+        font-size: 0.9em!important;
+    }
 </style>
 @endsection
