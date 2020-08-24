@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\CategoriesProduit;
 use App\User;
+use PanierControlller;
 
 class MainController extends Controller
 {

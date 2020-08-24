@@ -69,10 +69,13 @@
     {
         // Variables goblales
         let panier = $('#panier');
-        let panier_vide = true; 
         let categorie = $('#categorie');
+        let panier_vide = true; 
         let article_actif = null;
         
+        ajaxGetPanier();
+        
+        // -------------------------------------------
         // -----------------Fonctions-----------------
         
         // Cacher/Afficher les informations d'un produit
@@ -109,10 +112,11 @@
             let btn_supprimer = '<button class="btn btn-danger btn-sm supprimer_produit">'+
                                     'supprimer'+
                                 '</button>';
+            //Recuperer id et url image du produit
             let input_id = produit.children('.row').children('input');
-            
+            let url_img = produit.children('.py-2').children('img').attr('src');
             // Effectuer requete ajax
-            // ajaxAjouterProduit(input_id.val());
+            ajaxAjouterProduit(input_id.val(), url_img);
             
             // Enlever infos du produit
             produit.children('.row')
@@ -126,14 +130,18 @@
                    .append(btn_supprimer)
                    .append(input_id);
             // Modifier quelques classes
-            produit.toggleClass('produit shadow col-1 px-0');
+            produit.toggleClass('produit shadow col-1 px-0 mx-2');
             // Ajouter l element creer au panier
             $('#panier').append(produit);
         }
         // Enleve un produit du panier
         function supprimerProduitPanier(produit)
         {
+            ajaxSupprimerProduit(
+                produit.children().children('input').val()
+            );
             produit.remove();
+
             if(panier.children().length < 1 )
             {
                 panier.append('<span>Vide</span>');
@@ -141,42 +149,69 @@
             }
         }
 
+        // --------------------------------------
         // -----------------Ajax-----------------
-        // Test methode ajax
-        // $.ajax({
-        //     method  :'GET',
-        //     url     :'testAjax',
-        //     dataType:'html'
-        // }).done(function(data)
-        // {
-        //     panier.append(data)
-        // });
 
-        function ajaxAjouterProduit(idProduit)
+        function ajaxAjouterProduit(idProduit, urlImage)
         {
             $.ajax({
-                method:'GET',
-                url   :'ajaxAjouterArticle/'+idProduit
-            }).done(function()
+                method  :'GET',
+                url     :'/ajaxAjouterArticle/'+idProduit,
+                data    : {'url_img' : urlImage},
+                dataType:'html'
+            })
+            .fail(function()
             {
-                alert('produit ajoute au panier');
-            }).fail(function()
-            {
-                alert('erreur');
+                alert('erreur: impossible d ajouter article');
             });
         }
         
+        function ajaxSupprimerProduit(idProduit)
+        {
+            $.ajax({
+                method:'GET',
+                url   :'ajaxSupprimerArticle/'+idProduit,
+            })
+            .fail(function()
+            {
+                alert('erreur suppression');
+            })
+        }
         function ajaxGetPanier()
         {
             $.ajax({
                 method  :'GET',
-                url     :'ajaxGetPanier',
+                url     :'/ajaxGetPanier',
                 dataType:'json'
             }).done(function(data)
             {
-                return data;
-            });
+                if(!data || data.invalid)
+                {
+                    return;
+                }
+
+                panier.children().remove();
+                panier_vide = false;
+
+                data.forEach(produit => 
+                {
+                    let element = '<div class="container border m-0 m-2 p-0 row col-1 px-0">'+
+                                 '<div class="py-2 mx-2 d-flex flex-column justify-content-center">'+
+                                    '<img src="'+produit[1]+'" height="100px" alt="image produit" style="height: 70px;">'+
+                                    '<button class="btn btn-danger btn-sm supprimer_produit">supprimer</button>'+
+                                    '<input type="hidden" name="idProduit" value="'+produit[0]+'">'+
+                                '</div>'+
+                                '</div>';
+                    panier.append(element);
+                });
+                // console.log(data);
+            }).fail(function()
+            {
+                console.log('fail');
+            })
         }
+
+        // --------------------------------------------
         // -----------------Evenements-----------------
        
         //---------Listeners barre lateral---------

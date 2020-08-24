@@ -7,33 +7,48 @@ use App\ArticlesPanier;
 
 class PanierController extends Controller
 {
-    //
+    //Retourne les articles du panier
     public function ajaxGetPanier(Request $request)
     {
         if($request->session()->has('produits'))
-            return $request->session('produits');
-        return [];
+        {
+            $produits =  json_encode($request->session()->get('produits'));
+            return $produits;
+        }
+        return json_encode(['invalid' => true]);
     }
 
+    // Ajoute un article au panier
     public function ajaxAjouterArticle(Request $request, $id_produit)
     {
         $produits = [];
         if(!$request->session()->exists('produits'))
-            session('produits',[]);
-        // $produits_session = session('produits');
-        // for($i = 0; $i < count($produits_session); $i++)
-        //     $produits[$i] = $produits_session[$i];
-        // $produits[count($produits)] = $id_produit;
-        $request->session()->push('produits', $id_produit);
-        session('articles', $produits);
+            $request->session()->put('produits',[]);
+        
+        $request->session()->push('produits', [$id_produit, $request['url_img']]);
     }
 
+    // Supprime un article du panier
     public function ajaxSupprimerArticle(Request $request,$id_produit)
     {
-        $request->session()->forget($id_produit);
+        if($request->session()->exists('produits'))
+        {
+            $produits_session = $request->session()->get('produits');
+        }else
+        {
+            return;
+        }
+        for($i = 0; $i < count($produits_session); $i++)
+        {
+            if($produits_session[$i][0] != $id_produit)
+                $produits[$i] = $produits_session[$i];
+        }
+        $request->session()->put('produits', $produits);
     }
-    public function testAjax()
+    
+    // Supprime les donnees de la session active
+    public function flushSession(Request $request)
     {
-        return '<div class="bg-dark text-white">pass</div>';
+        $request->session()->flush();
     }
 }
