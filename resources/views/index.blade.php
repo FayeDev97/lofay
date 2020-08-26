@@ -3,8 +3,8 @@
 @section('content')
 <span id="top"></span>
 <div class="container-fluid row">
-    <div class="side-bar p-0 pt-5 d-inline-block bg-light sticky-top col h-50" id="side-bar">
-        
+    {{-- Bare lateral --}}
+    <div class="side-bar p-0 pt-5 d-inline-block bg-light sticky-top col h-50" id="side-bar">  
         <div id="panier-btn" class="side-bar-items m-0 mb-4 ml-1 p-1 py-2 row flex-column align-items-center border rounded">
             <svg width="1.9em" height="1.9em" viewBox="0 0 16 16" class="bi bi-cart" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
@@ -48,15 +48,21 @@
             <span>FAQ</span>
         </a>
     </div>
+    {{-- Main Container --}}
     <div class="col-11">
+        {{-- Panier --}}
         <div class="container">
             <div id="panier" class="container border rounded shadow  bg-light row d-none">
                 <span>Vide<span>
             </div>
         </div>
+        {{-- Bare de recherche --}}
         <div class="container-fluid border rounded my-4 py-2">
             <x-barre-de-recherche/>
         </div>
+        {{-- Resultat recherche --}}
+        <div class="container-fluid border rounded my-4 py-2 d-none row" id="resultat"></div>
+        {{-- Produits --}}
         <div class="container-fluid border rounded my-4">
             <x-produits/>
         </div>
@@ -68,11 +74,13 @@
     $(document).ready(function() 
     {
         // Variables goblales
-        let panier = $('#panier');
-        let categorie = $('#categorie');
-        let panier_vide = true; 
+        let panier        = $('#panier');
+        let categorie     = $('#categorie');
+        let resultat      = $('#resultat');
+        let recherche     = $('#recherche');
+        let btn_recherche = $('#btn-recherche');
+        let panier_vide   = true; 
         let article_actif = null;
-        
         ajaxGetPanier();
         
         // -------------------------------------------
@@ -88,6 +96,26 @@
             produit.children().toggleClass('col-12 col-5 mx-2');
             produit.children().children('.info_produit').toggleClass('d-none');
             produit.children().children('.produit_exit').toggleClass('d-none');
+        }
+        function toggleProduit(produit)
+        {
+            if(article_actif != null)
+            {
+                if(article_actif.children().children('input').val() == produit.children().children('input').val())
+                {
+                    toggleInfoProduit(produit);
+                    article_actif = null;
+                }else
+                {
+                    toggleInfoProduit(article_actif);
+                    toggleInfoProduit(produit);
+                    article_actif = produit;
+                }
+            }else
+            {
+                toggleInfoProduit(produit);
+                article_actif = produit;
+            }
         }
         // Cache le panier
         function cacherPanier()
@@ -197,7 +225,7 @@
                 {
                     let element = '<div class="container border m-0 m-2 p-0 row col-1 px-0">'+
                                  '<div class="py-2 mx-2 d-flex flex-column justify-content-center">'+
-                                    '<img src="'+produit[1]+'" height="100px" alt="image produit" style="height: 70px;">'+
+                                    '<img src="'+produit[1]+'" height="70px" alt="image produit">'+
                                     '<button class="btn btn-danger btn-sm supprimer_produit">supprimer</button>'+
                                     '<input type="hidden" name="idProduit" value="'+produit[0]+'">'+
                                 '</div>'+
@@ -210,7 +238,59 @@
                 console.log('fail');
             })
         }
-
+        function ajaxRechercheProduit(nomProduit)
+        {
+            $.ajax({
+                method  :'GET',
+                url     :'/ajaxRechercheProduit',
+                data    :{'nomProduit':nomProduit},
+                dataType:'json'
+            })
+            .done(function(data)
+            {
+                if(!data || data.invalid)
+                {
+                    console.log('not found');
+                    return;
+                }
+                for (let index = 0; index < data.length; index++) 
+                {
+                            let element = '<div class="col-2">'+
+                                        '<div class="container border m-0 my-2 p-0 row produit">'+
+                                        '<div class="col-12 py-2">'+
+                                        '<img src="/storage/produits/'+data[index].image+'" height="100px" alt="image produit">'+
+                                        '<div class="prix">'+
+                                        '<span class="font-weight-bold">'+data[index].libelle+'</span> <br>'+
+                                        '<span class="">'+data[index].prixInit+' FCFA</span> <br>'+
+                                        '</div>'+
+                                        '</div>'+
+                                        '<div class="col-12 row m-0 p-0">'+
+                                        '<input type="hidden" name="idProduit" value="'+data[index].id+'">'+
+                                        '<div class="info_produit col d-none row bg-secondary text-white p-0">'+
+                                        '<div class="col-12">'+
+                                        'info: alpha<br>'+
+                                        'info: beta<br>'+
+                                        'info: omega<br>'+
+                                        '</div>'+
+                                        '<div class="col-12 p-2">'+
+                                        '<form action="/acheter/'+data[index].id+'" method="POST" class="my-2">'+
+                                        '@csrf'+
+                                        '<input type="hidden" name="idProduit" value="'+data[index].id+'">'+
+                                        '<button type="submit" class="btn btn-success form-control">Acheter</button>'+
+                                        '</form>'+
+                                        '<button class="btn btn-primary form-control ajouter_produit">Ajouter au panier</button>'+
+                                        '</div></div></div></div></div>';
+                            resultat.children().remove();
+                            resultat.append(element);     
+                }
+                
+                // console.log(data);
+            })
+            .fail(function()
+            {
+                console.log('fail');
+            })
+        }
         // --------------------------------------------
         // -----------------Evenements-----------------
        
@@ -232,23 +312,7 @@
         $('.produit').click(function()
         {
             let produit = $(this);
-            if(article_actif != null)
-            {
-                if(article_actif.children().children('input').val() == produit.children().children('input').val())
-                {
-                    toggleInfoProduit(produit);
-                    article_actif = null;
-                }else
-                {
-                    toggleInfoProduit(article_actif);
-                    toggleInfoProduit(produit);
-                    article_actif = produit;
-                }
-            }else
-            {
-                toggleInfoProduit(produit);
-                article_actif = produit;
-            }
+            toggleProduit(produit);
         });
 
         //---------Gestion du panier---------
@@ -259,7 +323,7 @@
                                 .clone();
             ajouterProduitPanier(produit);
         });
-       // supprime un produit du panier
+        // supprime un produit du panier
         panier.click(function()
         {
             let target  = $(event.target);
@@ -269,7 +333,19 @@
                 supprimerProduitPanier(produit); 
             }
         });
-       
+        //---------Gestion Barre de recherche---------
+        btn_recherche.click(function()
+        {
+            resultat.removeClass('d-none');
+            let nom_produit = recherche.val();
+            ajaxRechercheProduit(nom_produit);
+        });
+        //---------Gestion resultat de recherche
+        resultat.click(function()
+        {
+            let target = $(event.target);
+            toggleProduit(target.closest('.produit'));
+        });
     });
 </script>
 @endsection
@@ -277,7 +353,7 @@
 @section('css')
 <style>
     /*icone svg source:svgicons.sparkk.fr */
-    #bare-de-recherche, #bare-de-recherche input, #bare-de-recherche select
+    #barre-de-recherche, #barre-de-recherche input, #barre-de-recherche select
     {
         font-size: 0.9em!important;
     }

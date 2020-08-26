@@ -1,8 +1,8 @@
-<form action="recherche" method="POST" class="container p-2" id="bare-de-recherche">
+<div class="container p-2" id="barre-de-recherche">
     <div class="container form-group row">
         <span class="col-1"></span>
-        <input type="text" name="produit" id="" class="form-control col-8 mr-2">
-        <input type="submit" value="Rechercher" class="btn btn-primary col-2">
+        <input type="text" name="produit" id="recherche" class="form-control col-8 mr-2">
+        <input type="submit" value="Rechercher" id="btn-recherche" class="btn btn-primary col-2">
         <span class="col-1"></span>
     </div>
     <div class="container row justify-content-center">
@@ -31,10 +31,4 @@
             </select>
         </div>
     </div>
-</form>
-<script>
-    $(document).ready()
-    {
-
-    }
-</script>
+</div>

@@ -50,3 +50,6 @@ Route::get('/ajaxAjouterArticle/{id_produit}','PanierController@ajaxAjouterArtic
 Route::get('/ajaxSupprimerArticle/{id_produit}','PanierController@ajaxSupprimerArticle');
 Route::get('/testAjax','PanierController@testAjax');
 Route::get('/flush','PanierController@flushSession');
+
+// Recherche
+Route::get('/ajaxRechercheProduit','RechercheController@produit');

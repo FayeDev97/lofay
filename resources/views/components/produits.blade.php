@@ -15,7 +15,6 @@
                     <span class=""> {{$produit->prixInit}} FCFA</span> <br>
                 </div>
             </div>
-            {{-- <hr class="col-1 bg-dark"> --}}
             <div class="col-12 row m-0 p-0">
                 <input type="hidden" name="idProduit" value="{{$produit->id}}">
                 <div class="info_produit col d-none row bg-secondary text-white p-0">
