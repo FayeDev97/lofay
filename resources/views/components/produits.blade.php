@@ -1,5 +1,5 @@
 <div class="container row mt-4">
-    @if (count($produits) > 0)
+    @if (isset($produits) > 0)
     @foreach ($produits as $produit)
     <div class="col-2">
         <div class="container border m-0 my-2 p-0 row produit">
