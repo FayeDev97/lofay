@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\App;
 
-class HttpsProtocol extends Middleware
+class HttpsProtocol
 {
 
     public function handle($request, Closure $next)
