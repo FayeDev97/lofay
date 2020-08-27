@@ -24,8 +24,7 @@ class produits extends Component
      */
     public function render()
     {
-        $produits = Produit::orderBy('created_at','desc')
-                            ->get();;
+        $produits = Produit::orderBy('created_at','desc')->get();;
 
         return view('components.produits', ['produits' => $produits]);
     }
