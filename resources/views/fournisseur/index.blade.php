@@ -3,6 +3,9 @@
     <div class="container-fluid p-0 m-0 row">
         <div class="col-9">
             <div class="container row">
+                <div class="container py-2 mb-2">
+                    <a href="/ajouterProduit" class="btn btn-lg btn-primary">Ajouter un produit</a>
+                </div>
                 @if (count($produits) > 0)
                     @foreach ($produits as $produit)
                     <div class="col-4 my-1">
@@ -19,7 +22,6 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Supprimer</button>
                             </form>
-                            
                             <button class="btn btn-secondary mt-2 ml-3">
                                 <a href="/modifierProduit/{{$produit->id}}">Modifier</a>
                             </button>
@@ -41,10 +43,13 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled row ">
+                            <li class="col-12 m-2"><a href="" class="text-dark h5">Mes Produits</a></li>
+                            {{-- <li class="col-12 m-2"><a href="/ajouterProduit" class="text-dark h5">Ajouter un Produit</a></li> --}}
+                            <hr class="bg-dark border w-100">
                             <li class="col-12 m-2"><a href="" class="text-dark h5">Ma Boutique</a></li>
-                            <li class="col-12 m-2"><a href="" class="text-dark h5">Mes Clients</a></li>
                             <li class="col-12 m-2"><a href="" class="text-dark h5">Ventes</a></li>
-                            <li class="col-12 m-2"><a href="/ajouterProduit" class="text-dark h5">Ajouter un Produit</a></li>
+                            <hr class="bg-dark border w-100">
+                            <li class="col-12 m-2"><a href="" class="text-dark h5">Parametres</a></li>
                         </ul>
                     </div>
 

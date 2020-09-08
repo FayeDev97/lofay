@@ -2,9 +2,12 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage
+/config
 /vendor
 .env
 .env.backup
+.env.example
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
